@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="BusinessManager" basedir="." default="clean-build">
+	<!-- project properties -->
+    <property name="assets.dir"		value="assets"/>
+    <property name="src.dir"		value="src"/>
+	<property name="src.metainf"	value="${src.dir}/META-INF"/>
+	<property name="lib.dir"		value="lib"/>
+    <property name="build.dir"		value="build"/>
+    <property name="classes.dir"	value="${build.dir}/classes"/>
+    <property name="jar.dir"		value="${build.dir}/jar"/>
+	<property name="jar.zip"		value="${jar.dir}/bm.jar"/>
+	<property name="jar.main"		value="pt.davidafsilva.bm.client.Application"/>
+    <property name="keys.dir"		value="keys"/>
+	<property name="ks"				value="${keys.dir}/bm.ks"/>
+	<property name="cert"			value="${keys.dir}/bm.crt"/>
+	<property name="ts"				value="${keys.dir}/bm.ts"/>
+	<!-- well well, change this or add your own key/truststore -->
+	<property name="ks.pass"		value="Biz@Man2k12.."/>
+	<property name="key.pass"		value="Man@Biz2k12.."/>
+	<property name="ts.pass"		value="2k12Man@Biz"/>
+	
+	<!-- clean the build directory -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+	<target name="clean-all">
+		<delete dir="${build.dir}"/>
+		<!--
+		<delete dir="${keys.dir}"/>
+		-->
+	</target>
+	
+    <!-- compile procedures -->
+	<path id="classpath">
+	  <fileset dir="${lib.dir}">
+	    <include name="*.jar"/>
+	    <include name="javamail-1.4.5/*.jar"/>
+	  	<exclude name="*-javadoc.jar"/>
+	  	<exclude name="*-sources.jar"/>
+	  </fileset>
+	  <pathelement path="${build.dir}"/>
+	</path>
+	
+	<target name="compile-classes">
+		<mkdir dir="${classes.dir}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false" classpathref="classpath"/>
+		<!--
+		<copy todir="${classes.dir}/META-INF">
+		    <fileset dir="${src.metainf}"/>
+		</copy>
+		-->
+		<copy file="${src.dir}/log4j.properties" todir="${classes.dir}"/>
+	</target>
+
+    <!-- JAR procedures -->
+    	
+    <!-- builds the client requirements jar for external usage -->
+	<target name="compile-jar" depends="compile-classes">
+	    <mkdir dir="${jar.dir}"/>
+	    <jar destfile="${jar.zip}" basedir="${classes.dir}" filesetmanifest="mergewithoutmain" encoding="utf-8" duplicate="preserve">
+			<manifest>
+				<attribute name="Main-Class" value="${jar.main}"/>
+		        <attribute name="Class-Path" value="."/>
+				<!--
+		        <attribute name="Class-Path" value="h2-1.3.167.jar log4j-1.2.17.jar commons-codec-1.6.jar spring-core-3.2.1.RELEASE.jar spring-beans-3.2.1.RELEASE.jar spring-expression-3.2.1.RELEASE.jar spring-context-3.2.1.RELEASE.jar commons-logging-1.1.1.jar jgoodies-forms-1.5.1.jar jgoodies-common-1.4.0.jar microba-0.4.4.3.jar itext-xtra-5.3.5.jar itextpdf-5.3.5.jar dsn.jar imap.jar mailapi.jar pop3.jar smtp.jar"/>
+		        <attribute name="Class-Path" value="."/>
+		        -->
+			</manifest>
+	    	<fileset dir=".">
+	    	    <include name="**/${assets.dir}/**"/>
+	    	</fileset>
+	    	<zipfileset file="${ts}"/>
+	    	<!--
+            <zipfileset dir="${lib.dir}" includes="spring-core-3.2.1.RELEASE.jar"/>
+            <zipfileset dir="${lib.dir}" includes="spring-beans-3.2.1.RELEASE.jar"/>
+            <zipfileset dir="${lib.dir}" includes="spring-expression-3.2.1.RELEASE.jar"/>
+            <zipfileset dir="${lib.dir}" includes="spring-context-3.2.1.RELEASE.jar"/>
+	    	<zipfileset dir="${lib.dir}" includes="h2-1.3.167.jar"/>
+            <zipfileset dir="${lib.dir}" includes="log4j-1.2.17.jar"/>
+            <zipfileset dir="${lib.dir}" includes="commons-codec-1.6.jar"/>
+            <zipfileset dir="${lib.dir}" includes="commons-logging-1.1.1.jar"/>
+            <zipfileset dir="${lib.dir}" includes="jgoodies-forms-1.5.1.jar"/>
+            <zipfileset dir="${lib.dir}" includes="jgoodies-common-1.4.0.jar"/>
+            <zipfileset dir="${lib.dir}" includes="microba-0.4.4.3.jar"/>
+            <zipfileset dir="${lib.dir}" includes="itext-xtra-5.3.5.jar"/>
+            <zipfileset dir="${lib.dir}" includes="itextpdf-5.3.5.jar"/>
+            <zipfileset dir="${lib.dir}/javamail-1.4.5" includes="dsn.jar"/>
+            <zipfileset dir="${lib.dir}/javamail-1.4.5" includes="imap.jar"/>
+            <zipfileset dir="${lib.dir}/javamail-1.4.5" includes="mailapi.jar"/>
+            <zipfileset dir="${lib.dir}/javamail-1.4.5" includes="pop3.jar"/>
+            <zipfileset dir="${lib.dir}/javamail-1.4.5" includes="smtp.jar"/>	    	
+	    	-->
+	    	<zipfileset excludes="META-INF/*.SF" src="${lib.dir}/h2-1.3.167.jar"/>
+	    	<zipfileset excludes="META-INF/*.SF" src="${lib.dir}/exp4j-0.3.10.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/log4j-1.2.17.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/commons-codec-1.6.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/commons-logging-1.1.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/jgoodies-forms-1.5.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/jgoodies-common-1.4.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/microba-0.4.4.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/itext-xtra-5.3.5.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/itextpdf-5.3.5.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/icepdf-core.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/icepdf-viewer.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/javamail-1.4.5/mailapi.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/javamail-1.4.5/smtp.jar"/>
+		</jar>
+	</target>
+	
+	<!--
+	<target name="update-jar" depends="compile-jar">
+		<jar destfile="${jar.zip}" update="true" duplicate="preserve">
+			<zipfileset file="${ts}"/>
+	    	<zipfileset excludes="META-INF/*.SF" src="${lib.dir}/h2-1.3.167.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/log4j-1.2.17.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/jgoodies-forms-1.5.1.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/jgoodies-common-1.4.0.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/commons-logging-1.1.1.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/commons-codec-1.6.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/org.springframework.core-3.1.1.RELEASE.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/org.springframework.beans-3.1.1.RELEASE.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/org.springframework.context-3.1.1.RELEASE.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/org.springframework.asm-3.1.1.RELEASE.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/org.springframework.expression-3.1.1.RELEASE.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/javamail-1.4.5/dsn.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/javamail-1.4.5/imap.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/javamail-1.4.5/mailapi.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/javamail-1.4.5/pop3.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/javamail-1.4.5/smtp.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/itextpdf-5.3.5.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/itext-xtra-5.3.5.jar"/>
+	        <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/microba-0.4.4.3.jar"/>
+		</jar>
+	</target>
+	-->
+	
+	<!-- keystore procedure - change key when building the project -->
+	<target name="check-keystore">
+	    <available file="${ks}" property="ks.present"/>
+	</target>
+	<target name="check-keystore-again">
+		<available file="${ks}" property="ks.present"/>
+	</target>
+	
+	<target name="generateKeysAndCerts" depends="check-keystore" unless="ks.present">
+		<mkdir dir="${keys.dir}"/>
+		<exec executable="keytool">
+			<arg line="-genkey"/>
+			<arg line="-alias david"/>
+			<arg line="-storetype JKS"/>
+			<arg line="-keysize 2048"/>
+			<arg line="-keyalg RSA"/>
+			<arg line="-keystore ${ks}"/>
+			<arg line="-storepass ${ks.pass}"/>
+			<arg line="-keypass ${key.pass}"/>
+			<arg line="-dname 'CN=davidafsilva.pt, OU=David Silva, O=David Silva , L=DS, ST=Lisbon, C=PT'"/>
+			<arg line="-validity 365"/>
+		</exec>
+		<echo>Keystore generated.</echo>
+		<exec executable="keytool">
+			<arg line="-exportcert"/>
+			<arg line="-rfc"/>
+			<arg line="-alias david"/>
+			<arg line="-keystore ${ks}"/>
+			<arg line="-storepass ${ks.pass}"/>
+			<arg line="-file ${cert}"/>
+		</exec>
+		<echo>Certificates exported.</echo>
+		<exec executable="keytool">
+			<arg line="-importcert"/>
+			<arg line="-noprompt"/>
+			<arg line="-trustcacerts"/>
+			<arg line="-file ${cert}"/>
+			<arg line="-alias david"/>
+			<arg line="-storetype JKS"/>
+			<arg line="-keystore ${ts}"/>
+			<arg line="-storepass ${ts.pass}"/>
+		</exec>
+		<echo>Trust store created from certificate.</echo>
+	</target>
+		
+	<!-- sign the jars -->
+	<target name="signJars" depends="check-keystore-again" if="ks.present">
+		<signjar keystore="${ks}" storepass="${ks.pass}" keypass="${key.pass}" alias="david" preservelastmodified="true" jar="${jar.zip}" />
+		<echo>BM jar successfully signed</echo>
+	</target>
+	
+	<!-- default procedure: cleans and builds the entire project -->
+    <target name="clean-build" depends="clean-all, generateKeysAndCerts, compile-jar, signJars">
+    	<echo>${ant.project.name} successfully built.</echo>
+    </target>
+</project>

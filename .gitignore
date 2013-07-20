@@ -1,0 +1,8 @@
+bm.log
+build
+keys
+.DS_Store
+bin
+.project
+.classpath
+.settings
