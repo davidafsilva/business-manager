@@ -1,6 +1,12 @@
 package pt.davidafsilva.bm.client.presenter;
 
-import java.awt.Desktop;
+import de.congrace.exp4j.Calculable;
+import de.congrace.exp4j.ExpressionBuilder;
+
+import org.icepdf.ri.common.SwingController;
+import org.icepdf.ri.common.SwingViewBuilder;
+
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -10,11 +16,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
-import org.icepdf.ri.common.SwingController;
-import org.icepdf.ri.common.SwingViewBuilder;
+
+import javax.swing.*;
+
 import pt.davidafsilva.bm.client.Application;
 import pt.davidafsilva.bm.client.ui.DSDialog;
 import pt.davidafsilva.bm.client.view.BusinessManagerView;
@@ -34,8 +38,6 @@ import pt.davidafsilva.bm.shared.enums.ConfigurationKey;
 import pt.davidafsilva.bm.shared.enums.ProductUnit;
 import pt.davidafsilva.bm.shared.exception.ApplicationException;
 import pt.davidafsilva.bm.shared.utils.FileUtil;
-import de.congrace.exp4j.Calculable;
-import de.congrace.exp4j.ExpressionBuilder;
 
 
 /**
@@ -491,16 +493,8 @@ public class BusinessManagerPresenter extends BasePresenter<BusinessManagerView>
 	/**
 	 * Validates the product
 	 * 
-	 * @param name
-	 *        The name
 	 * @param code
 	 *        The code
-	 * @param address
-	 *        The address
-	 * @param phone
-	 *        The phone
-	 * @param fax
-	 *        The fax
 	 */
 	private boolean validateProduct(String description, String code, String price, String defaultAmount, ProductUnit defaultUnit) {
 		// name validation
@@ -1055,7 +1049,9 @@ public class BusinessManagerPresenter extends BasePresenter<BusinessManagerView>
 			configurations = configService.getUserConfiguration(Application.get().getAuthenticatedUser().getId());
 			view.setUserConfigurationValues(
 					configurations.get(ConfigurationKey.EMAIL_AUTHOR.getCode()),
-					configurations.get(ConfigurationKey.EMAIL_ADDRESS.getCode()),
+					configurations.get(ConfigurationKey.EMAIL_ADDRESS_SOURCE.getCode()),
+					configurations.get(ConfigurationKey.EMAIL_ADDRESS_SOURCE_PWD.getCode()),
+					configurations.get(ConfigurationKey.EMAIL_ADDRESS_TARGET.getCode()),
 					configurations.get(ConfigurationKey.EMAIL_SUBJECT.getCode()),
 					configurations.get(ConfigurationKey.EMAIL_BODY.getCode()),
 					configurations.get(ConfigurationKey.SALE_INFO_PROD_CODE.getCode()).getValue().equals("1"),
@@ -1077,7 +1073,9 @@ public class BusinessManagerPresenter extends BasePresenter<BusinessManagerView>
 	public void resetEmailConfiguration() {
 		view.setUserEmailConfigurationValues(
 				configurations.get(ConfigurationKey.EMAIL_AUTHOR.getCode()),
-				configurations.get(ConfigurationKey.EMAIL_ADDRESS.getCode()),
+				configurations.get(ConfigurationKey.EMAIL_ADDRESS_SOURCE.getCode()),
+				configurations.get(ConfigurationKey.EMAIL_ADDRESS_SOURCE_PWD.getCode()),
+				configurations.get(ConfigurationKey.EMAIL_ADDRESS_TARGET.getCode()),
 				configurations.get(ConfigurationKey.EMAIL_SUBJECT.getCode()),
 				configurations.get(ConfigurationKey.EMAIL_BODY.getCode())
 				);
@@ -1088,16 +1086,23 @@ public class BusinessManagerPresenter extends BasePresenter<BusinessManagerView>
 	 * 
 	 * @param author
 	 *        The e-mail author
-	 * @param email
-	 *        The e-mail address
+	 * @param sourceEmail
+	 *        The source e-mail address
+	 * @param sourcePassword
+	 *        The source e-mail password
+	 * @param targetEmail
+	 *        The target e-mail address
 	 * @param subject
 	 *        The e-mail subject
 	 * @param body
 	 *        The e-mail body
 	 */
-	public void saveConfiguration(String author, String email, String subject, String body) {
+	public void saveConfiguration(String author, String sourceEmail, String sourcePassword,
+			String targetEmail,  String subject, String body) {
 		if (!validateConfigurationValue(author, "o nome")
-				|| !validateConfigurationValue(email, "o e-mail")
+				|| !validateConfigurationValue(sourceEmail, "o e-mail fonte")
+				|| !validateConfigurationValue(sourcePassword, "a password do e-mail")
+				|| !validateConfigurationValue(targetEmail, "o e-mail destino")
 				|| !validateConfigurationValue(subject, "o assunto")
 				|| !validateConfigurationValue(body, "a mensagem")) {
 			return;
@@ -1106,12 +1111,17 @@ public class BusinessManagerPresenter extends BasePresenter<BusinessManagerView>
 		view.setEnabled(false);
 		
 		Configuration cfgAuthor = (Configuration) configurations.get(ConfigurationKey.EMAIL_AUTHOR.getCode()).clone();
-		Configuration cfgEmail = (Configuration) configurations.get(ConfigurationKey.EMAIL_ADDRESS.getCode()).clone();
+		Configuration cfgEmailTarget = (Configuration) configurations.get(ConfigurationKey.EMAIL_ADDRESS_TARGET.getCode()).clone();
+		Configuration cfgEmailSource = (Configuration) configurations.get(ConfigurationKey.EMAIL_ADDRESS_SOURCE.getCode()).clone();
+		Configuration cfgEmailSourcePwd = (Configuration) configurations.get(ConfigurationKey.EMAIL_ADDRESS_SOURCE_PWD
+				.getCode()).clone();
 		Configuration cfgSubject = (Configuration) configurations.get(ConfigurationKey.EMAIL_SUBJECT.getCode()).clone();
 		Configuration cfgBody = (Configuration) configurations.get(ConfigurationKey.EMAIL_BODY.getCode()).clone();
 		
 		cfgAuthor.setValue(author);
-		cfgEmail.setValue(email);
+		cfgEmailSource.setValue(sourceEmail);
+		cfgEmailSourcePwd.setValue(sourcePassword);
+		cfgEmailTarget.setValue(targetEmail);
 		cfgSubject.setValue(subject);
 		cfgBody.setValue(body);
 		
@@ -1119,14 +1129,18 @@ public class BusinessManagerPresenter extends BasePresenter<BusinessManagerView>
 		try {
 			List<Configuration> configs = new ArrayList<Configuration>();
 			configs.add(cfgAuthor);
-			configs.add(cfgEmail);
+			configs.add(cfgEmailSource);
+			configs.add(cfgEmailSourcePwd);
+			configs.add(cfgEmailTarget);
 			configs.add(cfgSubject);
 			configs.add(cfgBody);
 			configService.update(configs);
 			
 			// update local configuration
 			configurations.put(ConfigurationKey.EMAIL_AUTHOR.getCode(), cfgAuthor);
-			configurations.put(ConfigurationKey.EMAIL_ADDRESS.getCode(), cfgEmail);
+			configurations.put(ConfigurationKey.EMAIL_ADDRESS_SOURCE.getCode(), cfgEmailSource);
+			configurations.put(ConfigurationKey.EMAIL_ADDRESS_SOURCE_PWD.getCode(), cfgEmailSourcePwd);
+			configurations.put(ConfigurationKey.EMAIL_ADDRESS_TARGET.getCode(), cfgEmailTarget);
 			configurations.put(ConfigurationKey.EMAIL_SUBJECT.getCode(), cfgSubject);
 			configurations.put(ConfigurationKey.EMAIL_BODY.getCode(), cfgBody);
 		} catch (ApplicationException e) {
@@ -1213,8 +1227,6 @@ public class BusinessManagerPresenter extends BasePresenter<BusinessManagerView>
 	/**
 	 * Validates a configuration value
 	 * 
-	 * @param client
-	 *        The configuration value
 	 * @return <code>true</code> if everything went smoothly, <code>false</code> otherwise.
 	 */
 	private boolean validateConfigurationValue(String value, String field) {

@@ -56,6 +56,8 @@ public class ConfigurationService implements IConfigurationService {
 	@Override
 	public void update(List<Configuration> configs) throws ApplicationException {
 		log.debug("update(): updating the configuration.. ");
+
+		//FIXME: cipher e-mail password
 		try {
 			for (Configuration config : configs) {
 				configurationDAO.update(config);

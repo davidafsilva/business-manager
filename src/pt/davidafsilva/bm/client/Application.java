@@ -1,10 +1,9 @@
 package pt.davidafsilva.bm.client;
 
 import java.sql.SQLException;
-import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+
+import javax.swing.*;
+
 import pt.davidafsilva.bm.client.presenter.BusinessManagerPresenter;
 import pt.davidafsilva.bm.client.presenter.LoginPresenter;
 import pt.davidafsilva.bm.client.view.BusinessManagerView;
@@ -15,29 +14,29 @@ import pt.davidafsilva.bm.shared.domain.User;
 
 /**
  * Application.java
- * 
+ *
  * The application class
- * 
+ *
  * @author David Silva <david@davidafsilva.pt>
  * @date 11:18:00 PM
  */
 public class Application {
-	
+
 	// application singleton instance
 	private static Application instance;
-	
+
 	// authed user
 	private User user;
-	
+
 	// Authentication screen
 	private LoginPresenter loginPresenter;
-	
+
 	// BM presenter (main)
 	private BusinessManagerPresenter bmPresenter;
-	
+
 	/**
 	 * Gets the application single-ton instance
-	 * 
+	 *
 	 * @return
 	 *         The application instance
 	 */
@@ -48,7 +47,7 @@ public class Application {
 		}
 		return instance;
 	}
-	
+
 	/**
 	 * Initializes the application
 	 */
@@ -60,11 +59,11 @@ public class Application {
 			} catch (Exception e) {
 			}
 		}
-		
+
 		// set the default tooltip delay
 		ToolTipManager.sharedInstance().setDismissDelay(10000);
 		ToolTipManager.sharedInstance().setInitialDelay(500);
-		
+
 		// initialize the database
 		try {
 			if (!DatabaseManager.isInitialized()) {
@@ -76,16 +75,26 @@ public class Application {
 			throw new RuntimeException("Ocorreu um erro ao inicializar a aplica\u00E7\u00E3o.\n" + e.getMessage());
 		}
 	}
-	
+
+	private static void setUIFont(javax.swing.plaf.FontUIResource f){
+		java.util.Enumeration keys = UIManager.getDefaults().keys();
+		while (keys.hasMoreElements()) {
+			Object key = keys.nextElement();
+			Object value = UIManager.get (key);
+			if (value != null && value instanceof javax.swing.plaf.FontUIResource)
+				UIManager.put (key, f);
+		}
+	}
+
 	/**
 	 * Initializes and starts the application
-	 * 
+	 *
 	 * @throws UnsupportedLookAndFeelException
 	 */
 	public void start() {
 		// starts the application
 		SwingUtilities.invokeLater(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				try {
@@ -98,10 +107,10 @@ public class Application {
 			}
 		});
 	}
-	
+
 	/**
 	 * Starts the application with the given user (post-authentication).
-	 * 
+	 *
 	 * @param authUser
 	 *        The authenticated user
 	 */
@@ -111,10 +120,10 @@ public class Application {
 		}
 		this.user = authUser;
 		loginPresenter.hide();
-		
+
 		// starts the main application
 		SwingUtilities.invokeLater(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				try {
@@ -125,20 +134,20 @@ public class Application {
 			}
 		});
 	}
-	
+
 	/**
 	 * Gets the main application presenter
-	 * 
+	 *
 	 * @return The main application presenter
 	 */
 	private BusinessManagerPresenter getMainPresenter() {
 		if (bmPresenter == null) {
 			bmPresenter = new BusinessManagerPresenter(new BusinessManagerView());
 		}
-		
+
 		return bmPresenter;
 	}
-	
+
 	/**
 	 * Shuts down the application
 	 */
@@ -153,7 +162,7 @@ public class Application {
 		instance = null;
 		System.exit(0);
 	}
-	
+
 	/**
 	 * Logs out from the application
 	 */
@@ -165,45 +174,45 @@ public class Application {
 		bmPresenter = null;
 		loginPresenter.show();
 	}
-	
+
 	/**
 	 * Gets the authenticated user
-	 * 
+	 *
 	 * @return
 	 *         The authenticated user
 	 */
 	public User getAuthenticatedUser() {
 		return user;
 	}
-	
-	
+
+
 	/**
 	 * The entry point.
 	 * Launches the application.
-	 * 
+	 *
 	 * @param args
 	 *        Command line arguments
 	 */
 	public static void main(String[] args) {
 		Application.get().start();
 	}
-	
+
 	/**
 	 * Checks if is running under OS X
-	 * 
+	 *
 	 * @return <code>true</code> if the application is running under OS X, <code>false</code> otherwise.
 	 */
 	public boolean isOSX() {
 		return System.getProperty("os.name", "n/a").equalsIgnoreCase("mac os x");
 	}
-	
+
 	/**
 	 * Checks if is running under a Windows platform
-	 * 
+	 *
 	 * @return <code>true</code> if the application is running under windows, <code>false</code> otherwise.
 	 */
 	public boolean isWindows() {
 		return System.getProperty("os.name", "n/a").contains("Windows");
 	}
-	
+
 }

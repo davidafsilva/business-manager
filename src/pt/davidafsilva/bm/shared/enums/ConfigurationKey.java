@@ -9,7 +9,9 @@ package pt.davidafsilva.bm.shared.enums;
  */
 public enum ConfigurationKey {
 	EMAIL_AUTHOR("email-author"),
-	EMAIL_ADDRESS("email-addr"),
+	EMAIL_ADDRESS_SOURCE("email-addr-src"),
+	EMAIL_ADDRESS_SOURCE_PWD("email-addr-pwd"),
+	EMAIL_ADDRESS_TARGET("email-addr"),
 	EMAIL_SUBJECT("email-subject"),
 	EMAIL_BODY("email-body"),
 	SALE_INFO_PROD_CODE("sale-prod-code"),

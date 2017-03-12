@@ -1,12 +1,11 @@
 package pt.davidafsilva.bm.client.view;
 
-import java.awt.Cursor;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import javax.swing.ImageIcon;
-import javax.swing.WindowConstants;
-import pt.davidafsilva.bm.client.Application;
+
+import javax.swing.*;
+
 import pt.davidafsilva.bm.client.enums.ImagesEnum;
 import pt.davidafsilva.bm.client.presenter.BasePresenter;
 import pt.davidafsilva.bm.client.ui.DSFrame;
@@ -126,9 +125,9 @@ public abstract class BaseView<P extends BasePresenter<?>> extends DSFrame {
 	@Override
 	public void setIconImage(Image image) {
 		super.setIconImage(image);
-		if (Application.get().isOSX()) {
-			com.apple.eawt.Application.getApplication().setDockIconImage(new ImageIcon(ImagesEnum.WINDOWS_ICON.getPath()).getImage());
-		}
+//		if (Application.get().isOSX()) {
+//			com.apple.eawt.Application.getApplication().setDockIconImage(new ImageIcon(ImagesEnum.WINDOWS_ICON.getPath()).getImage());
+//		}
 	}
 	
 	/**

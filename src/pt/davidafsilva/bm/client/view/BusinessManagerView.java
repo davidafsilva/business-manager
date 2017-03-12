@@ -1,14 +1,12 @@
 package pt.davidafsilva.bm.client.view;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import com.jgoodies.forms.factories.Borders;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
+import com.michaelbaranov.microba.calendar.CalendarPane;
+import com.michaelbaranov.microba.calendar.DatePicker;
+
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -27,21 +25,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
+
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import pt.davidafsilva.bm.client.enums.ImagesEnum;
 import pt.davidafsilva.bm.client.presenter.BusinessManagerPresenter;
 import pt.davidafsilva.bm.client.ui.DSCheckBox;
@@ -72,11 +61,6 @@ import pt.davidafsilva.bm.shared.domain.Sale;
 import pt.davidafsilva.bm.shared.domain.SaleProduct;
 import pt.davidafsilva.bm.shared.domain.UserPermission;
 import pt.davidafsilva.bm.shared.enums.ProductUnit;
-import com.jgoodies.forms.factories.Borders;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-import com.michaelbaranov.microba.calendar.CalendarPane;
-import com.michaelbaranov.microba.calendar.DatePicker;
 
 
 /**
@@ -154,9 +138,9 @@ public class BusinessManagerView extends BaseView<BusinessManagerPresenter> {
 	// ------------------------------
 	// Configuration menu components 
 	// ------------------------------
-	private DSTextField cfgTfEmail, cfgTfSubject, cfgTfBody, cfgTfAuthor;
+	private DSTextField cfgTfSourceEmail, cfgTfTargetEmail, cfgTfSubject, cfgTfBody, cfgTfAuthor;
 	private JButton cfgEmailBtnSave, cfgEmailBtnCancel;
-	private DSPasswordField cfgTfOldPwd, cfgTfNewPwd, cfgTfNewPwdConfirmation;
+	private DSPasswordField cfgTfOldPwd, cfgTfEmailPwd, cfgTfNewPwd, cfgTfNewPwdConfirmation;
 	private JButton cfgPwdBtnSave;
 	private JCheckBox cfgCbProductCode, cfgCbProductDesc, cfgCbProductQty, cfgCbProductPrice,
 			cfgCbDiscount, cfgCbVat, cfgCbTotals;
@@ -1547,7 +1531,9 @@ public class BusinessManagerView extends BaseView<BusinessManagerPresenter> {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					presenter.saveConfiguration(
 							cfgTfAuthor.getText(),
-							cfgTfEmail.getText(),
+							cfgTfSourceEmail.getText(),
+							String.valueOf(cfgTfEmailPwd.getPassword()),
+							cfgTfTargetEmail.getText(),
 							cfgTfSubject.getText(),
 							cfgTfBody.getText()
 							);
@@ -1604,18 +1590,22 @@ public class BusinessManagerView extends BaseView<BusinessManagerPresenter> {
 				// columns
 				"pref, 10px, pref:grow",
 				// rows
-				"pref, pref, pref, pref, 5px, pref"));
+				"pref, pref, pref, pref, pref, pref, 5px, pref"));
 		frmEmail.setBorder(BorderFactory.createTitledBorder("Configura\u00E7\u00F5es de e-mail"));
 		CellConstraints frmConst = new CellConstraints();
 		buildFormItem(frmEmail, 1, frmConst, "Nome", (cfgTfAuthor = createTextField(false, false, true)));
-		cfgTfAuthor.setColumns(23);
-		buildFormItem(frmEmail, 2, frmConst, "Endere\u00E7o", (cfgTfEmail = createTextField(false, false, true)));
-		cfgTfEmail.setColumns(23);
-		buildFormItem(frmEmail, 3, frmConst, "Assunto", (cfgTfSubject = createTextField(false, false, true)));
-		cfgTfSubject.setColumns(23);
-		buildFormItem(frmEmail, 4, frmConst, "Mensagem", (cfgTfBody = createTextField(false, false, true)));
-		cfgTfBody.setColumns(23);
-		frmEmail.add(emailButtonContainer, frmConst.xy(3, 6, CellConstraints.RIGHT, CellConstraints.BOTTOM));
+		cfgTfAuthor.setColumns(21);
+		buildFormItem(frmEmail, 2, frmConst, "Endere\u00E7o Fonte", (cfgTfSourceEmail = createTextField(false, false, true)));
+		cfgTfSourceEmail.setColumns(21);
+		buildFormItem(frmEmail, 3, frmConst, "Password", (cfgTfEmailPwd = createPasswordField()));
+		cfgTfEmailPwd.setColumns(21);
+		buildFormItem(frmEmail, 4, frmConst, "Endere\u00E7o Destino", (cfgTfTargetEmail = createTextField(false, false, true)));
+		cfgTfTargetEmail.setColumns(21);
+		buildFormItem(frmEmail, 5, frmConst, "Assunto", (cfgTfSubject = createTextField(false, false, true)));
+		cfgTfSubject.setColumns(21);
+		buildFormItem(frmEmail, 6, frmConst, "Mensagem", (cfgTfBody = createTextField(false, false, true)));
+		cfgTfBody.setColumns(21);
+		frmEmail.add(emailButtonContainer, frmConst.xy(3, 8, CellConstraints.RIGHT, CellConstraints.BOTTOM));
 		
 		// form password changer
 		cfgPwdBtnSave = new JButton("Alterar");
@@ -1780,18 +1770,22 @@ public class BusinessManagerView extends BaseView<BusinessManagerPresenter> {
 	 * 
 	 * @param author
 	 *        The e-mail author
-	 * @param email
-	 *        the e-mail value
 	 * @param subject
 	 *        The subject value
 	 * @param body
 	 *        The body value
 	 */
-	public void setUserEmailConfigurationValues(Configuration author, Configuration email, Configuration subject, Configuration body) {
+	public void setUserEmailConfigurationValues(Configuration author,
+			Configuration sourceEmail, Configuration sourceEmailPassword,
+			Configuration targetEmail, Configuration subject, Configuration body) {
 		cfgTfAuthor.setText(author.getValue());
 		cfgTfAuthor.setToolTipText(author.getDescription());
-		cfgTfEmail.setText(email.getValue());
-		cfgTfEmail.setToolTipText(email.getDescription());
+		cfgTfSourceEmail.setText(sourceEmail.getValue());
+		cfgTfSourceEmail.setToolTipText(sourceEmail.getDescription());
+		cfgTfEmailPwd.setText(sourceEmailPassword.getValue());
+		cfgTfEmailPwd.setToolTipText(sourceEmailPassword.getDescription());
+		cfgTfTargetEmail.setText(targetEmail.getValue());
+		cfgTfTargetEmail.setToolTipText(targetEmail.getDescription());
 		cfgTfSubject.setText(subject.getValue());
 		cfgTfSubject.setToolTipText(subject.getDescription());
 		cfgTfBody.setText(body.getValue());
@@ -1827,18 +1821,19 @@ public class BusinessManagerView extends BaseView<BusinessManagerPresenter> {
 	 * 
 	 * @param author
 	 *        The e-mail author
-	 * @param email
-	 *        the e-mail value
 	 * @param subject
 	 *        The subject value
 	 * @param body
 	 *        The body value
 	 */
-	public void setUserConfigurationValues(Configuration author, Configuration email, Configuration subject, Configuration body,
+	public void setUserConfigurationValues(Configuration author,
+			Configuration sourceEmail, Configuration sourceEmailPassword,
+			Configuration targetEmail, Configuration subject, Configuration body,
 			boolean prodCodeIncluded, boolean prodDescIncluded,
 			boolean prodQtyIncluded, boolean prodPriceIncluded, boolean discountIncluded,
 			boolean vatIncluded, boolean totalsIncluded) {
-		setUserEmailConfigurationValues(author, email, subject, body);
+		setUserEmailConfigurationValues(author, sourceEmail, sourceEmailPassword, targetEmail,
+				subject, body);
 		setUserSaleResumeConfigurationValues(prodCodeIncluded, prodDescIncluded, prodQtyIncluded,
 				prodPriceIncluded, discountIncluded, vatIncluded, totalsIncluded);
 	}

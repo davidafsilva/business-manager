@@ -1,17 +1,6 @@
 package pt.davidafsilva.bm.client.ui.autocomplete;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -447,7 +436,10 @@ public abstract class DSAutoComplete<T> extends JPanel implements IDSToolTip {
 	 */
 	private void createListView() {
 		listView = new JList<T>(new DefaultListModel<T>());
-		listView.setCellRenderer(new DSAutoCompleteListCellRenderer());
+
+		final DSAutoCompleteListCellRenderer renderer = new DSAutoCompleteListCellRenderer();
+		renderer.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 17));
+		listView.setCellRenderer(renderer);
 		listView.setSelectionBackground(new Color(0xb9dbf2));
 		listView.setSelectionForeground(new Color(0x444444));
 		listView.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

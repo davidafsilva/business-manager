@@ -66,11 +66,35 @@ public class DatabaseManager {
 	        	" VALUES " +
 	        	"   ( "+
 	        	"   'Endere\u00E7o de e-mail destinat\u00E1rio dos resumos enviados por e-mail.',"+ 	//description
-	        	"   '"+ConfigurationKey.EMAIL_ADDRESS.getCode()+"',"+ 			//key
+	        	"   '"+ConfigurationKey.EMAIL_ADDRESS_TARGET.getCode()+"',"+ 			//key
 	        	"   'David Silva <182david@gmail.com>',"+ 	//value
 	        	"   1" + 						//user id
 	        	"   )"
 	        ));
+			execInsert(db, new Query(
+					" INSERT INTO CONFIGURATION " +
+							"	(DESCRIPTION, KEY, VALUE, USER_ID) " +
+							" VALUES " +
+							"   ( "+
+							"   'Endere\u00E7o de e-mail fonte para os resumos enviados por e-mail.',"+ 	//description
+							"   '"+ConfigurationKey.EMAIL_ADDRESS_SOURCE.getCode()+"',"+ 			//key
+							"   'changeme@gmail.com',"+ 	//value
+							"   1" + 						//user id
+							"   )"
+			));
+
+			execInsert(db, new Query(
+					" INSERT INTO CONFIGURATION " +
+							"	(DESCRIPTION, KEY, VALUE, USER_ID) " +
+							" VALUES " +
+							"   ( "+
+							"   'Password do endere\u00E7o de e-mail fonte para os resumos enviados por e-mail.',"+ 	//description
+							"   '"+ConfigurationKey.EMAIL_ADDRESS_SOURCE_PWD.getCode()+"',"+ 			//key
+							"   'changeme',"+ 	//value
+							"   1" + 						//user id
+							"   )"
+			));
+
 			execInsert(db, new Query(
 	        	" INSERT INTO CONFIGURATION " +
 	        	"	(DESCRIPTION, KEY, VALUE, USER_ID) " +
